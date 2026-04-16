@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <!-- nuget -->
+  <PropertyGroup>
+    <PackageId>UrlPreviewParser</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>kingsor</Authors>
+    <Description>A .NET library for extracting OpenGraph, Twitter Card, and oEmbed metadata from URLs. Port of the linkpreview Node.js project.</Description>
+    <Copyright>Copyright © 2026</Copyright>
+    <PackageTags>opengraph;twittercard;oembed;metadata;linkpreview;scraping;unfurl</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/kingsor/UrlPreviewParser</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/kingsor/UrlPreviewParser</RepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup Label="NuGet">
+    <None Include="NuGetIcon.png" Pack="true" PackagePath="/" />
+    <None Include="../NuGetPackageReadme.md" Pack="true" PackagePath="/"/>
+    <None Include="../../LICENSE" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AngleSharp" Version="1.1.2" />
+  </ItemGroup>
+  
+</Project>
