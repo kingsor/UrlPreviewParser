@@ -19,7 +19,7 @@
     <PackageProjectUrl>https://github.com/kingsor/UrlPreviewParser</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/kingsor/UrlPreviewParser</RepositoryUrl>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReadmeFile>NuGetPackageReadme.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup Label="NuGet">
