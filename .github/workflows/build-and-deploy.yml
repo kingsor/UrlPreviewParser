@@ -16,10 +16,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.x'
 
       - name: dotnet restore
         run: dotnet restore --configuration Release 
@@ -43,7 +45,7 @@ jobs:
           echo ${{ github.event.number }} > ./coveragereport/PullRequestNumber
   
       - name: Upload Code Coverage Report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: CodeCoverage
           path: coveragereport/
@@ -53,7 +55,7 @@ jobs:
         run: dotnet pack --configuration Release --no-build -o ./NuGet
 
       - name: Upload NuGet artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: NuGet
           path: ./NuGet
@@ -81,7 +83,7 @@ jobs:
     
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: NuGet
 
