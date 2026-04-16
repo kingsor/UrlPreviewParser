@@ -24,12 +24,16 @@
 
   <ItemGroup Label="NuGet">
     <None Include="NuGetIcon.png" Pack="true" PackagePath="/" />
-    <None Include="../NuGetPackageReadme.md" Pack="true" PackagePath="/"/>
+    <None Include="../NuGetPackageReadme.md" Pack="true" PackagePath="/" />
     <None Include="../../LICENSE" Pack="true" PackagePath="/" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="1.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Internals\" />
   </ItemGroup>
   
 </Project>
