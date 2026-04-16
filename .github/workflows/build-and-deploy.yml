@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v5
@@ -32,7 +32,7 @@ jobs:
       - name: ReportGenerator
         uses: danielpalme/ReportGenerator-GitHub-Action@5.5.5
         with:
-          reports: coverage/**/coverage.cobertura.xml
+          reports: code-coverage/**/coverage.cobertura.xml
           targetdir: coveragereport
           reporttypes: Html;MarkdownSummaryGithub
           title: 'Code Coverage'
@@ -43,20 +43,20 @@ jobs:
           echo ${{ github.event.number }} > ./coveragereport/PullRequestNumber
   
       - name: Upload Code Coverage Report
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
           name: CodeCoverage
           path: coveragereport/
           if-no-files-found: error
 
       - name: dotnet pack
-        run: dotnet pack --configuration Release --no-build -o .${{env.DOTNET_ROOT}}/NuGet
+        run: dotnet pack --configuration Release --no-build -o ./NuGet
 
       - name: Upload NuGet artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
           name: NuGet
-          path: ${{env.DOTNET_ROOT}}/NuGet
+          path: ./NuGet
 
   automerge:
     if: ${{ github.event_name == 'pull_request' }}
@@ -81,7 +81,7 @@ jobs:
     
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@v4
         with:
           name: NuGet
 
