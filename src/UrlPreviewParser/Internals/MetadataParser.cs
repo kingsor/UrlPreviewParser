@@ -23,9 +23,16 @@ internal static class MetadataParser
         {
             // Collect all attributes of this head element
             var attrs = new Dictionary<string, string?>();
+            
+            attrs["tag-name"] = element.LocalName;
+            
             foreach (var attr in element.Attributes)
                 attrs[attr.Name] = attr.Value;
-            result.Head.Add(attrs);
+
+            if(element.Attributes.Length > 0)
+            {
+                result.Head.Add(attrs);
+            }
 
             var tagName = element.TagName.ToUpperInvariant();
 
