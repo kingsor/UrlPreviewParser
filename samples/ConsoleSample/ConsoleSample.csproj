@@ -9,6 +9,13 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(UseLocalLib)' == 'true'">
+    <ProjectReference Include="..\..\src\UrlPreviewParser\UrlPreviewParser.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(UseLocalLib)' != 'true'">
     <PackageReference Include="UrlPreviewParser" Version="1.0.1" />
   </ItemGroup>
 

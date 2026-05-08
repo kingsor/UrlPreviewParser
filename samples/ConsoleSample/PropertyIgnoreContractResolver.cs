@@ -1,9 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using System;
-using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 
 namespace ConsoleSample
 {
@@ -29,7 +26,7 @@ namespace ConsoleSample
         {
             var property = base.CreateProperty(member, memberSerialization);
 
-            if (IsIgnored(property.DeclaringType, property.PropertyName))
+            if (property is not null && IsIgnored(property.DeclaringType, property.PropertyName))
             {
                 property.ShouldSerialize = i => false;
                 property.Ignored = true;
@@ -40,10 +37,7 @@ namespace ConsoleSample
 
         private bool IsIgnored(Type type, string jsonPropertyName)
         {
-            if (!_ignores.ContainsKey(type))
-                return false;
-
-            return _ignores[type].Contains(jsonPropertyName);
+            return !_ignores.ContainsKey(type) ? false : _ignores[type].Contains(jsonPropertyName);
         }
     }
 }
