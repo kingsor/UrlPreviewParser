@@ -14,7 +14,7 @@
 ### Formatting
 
 - Apply code-formatting style defined in `.editorconfig`.
-- Use primary constructors where applicable.
+- Do not use primary constructors.
 - Prefer file-scoped namespace declarations and single-line using directives.
 - Insert a newline before the opening curly brace of any code block (e.g., after `if`, `for`, `while`, `foreach`, `using`, `try`, etc.).
 - Ensure that the final return statement of a method is on its own line.
