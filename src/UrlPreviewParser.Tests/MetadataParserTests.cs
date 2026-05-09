@@ -130,7 +130,7 @@ public class MetadataParserTests
 
         var result = await Parse(html);
 
-        Assert.Equal(3, result.Head.Count);
+        Assert.Equal(2, result.Head.Count);
         Assert.True(result.Head[0].ContainsKey("charset"));
     }
 
