@@ -1,5 +1,7 @@
 <Solution>
   <Folder Name="/Samples/">
+    <Project Path="BlazorSample/BlazorSample.Client/BlazorSample.Client.csproj" Id="84779fc6-80d6-4323-a7cd-4a13d9e0a110" />
+    <Project Path="BlazorSample/BlazorSample/BlazorSample.csproj" Id="96e6d41b-24ac-4ae8-a926-5ed3453d4920" />
     <Project Path="samples/ConsoleSample/ConsoleSample.csproj" />
   </Folder>
   <Folder Name="/Solution Items/">
