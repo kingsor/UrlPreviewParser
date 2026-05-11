@@ -12,20 +12,20 @@
     <PackageId>UrlPreviewParser</PackageId>
     <Version>1.0.2</Version>
     <Authors>kingsor</Authors>
-    <Description>A .NET library for extracting OpenGraph, Twitter Card, and oEmbed metadata from URLs. Port of the linkpreview Node.js project.</Description>
+    <Description>A .NET library for extracting link preview metadata (OpenGraph, Twitter Card, oEmbed) from URLs.</Description>
     <Copyright>Copyright © 2026</Copyright>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/kingsor/UrlPreviewParser</RepositoryUrl>
-    <PackageTags>opengraph;twittercard;oembed;metadata;linkpreview;scraping;unfurl</PackageTags>
+    <PackageTags>opengraph;twittercard;oembed;open-graph;link-preview;url-metadata;linkpreview;scraping;unfurl;url-preview;</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/kingsor/UrlPreviewParser</PackageProjectUrl>
-    <PackageReadmeFile>NuGetPackageReadme.md</PackageReadmeFile>
+    <PackageReadmeFile>Readme.md</PackageReadmeFile>
     <PackageIcon>NuGetIcon.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup Label="NuGet">
     <None Include="NuGetIcon.png" Pack="true" PackagePath="/" />
-    <None Include="../NuGetPackageReadme.md" Pack="true" PackagePath="/" />
+    <None Include="../../Readme.md" Pack="true" PackagePath="/" />
     <None Include="../../LICENSE" Pack="true" PackagePath="/" />
   </ItemGroup>
 
