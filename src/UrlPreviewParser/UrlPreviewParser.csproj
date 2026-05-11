@@ -10,7 +10,7 @@
   <!-- nuget -->
   <PropertyGroup>
     <PackageId>UrlPreviewParser</PackageId>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
     <Authors>kingsor</Authors>
     <Description>A .NET library for extracting link preview metadata (OpenGraph, Twitter Card, oEmbed) from URLs.</Description>
     <Copyright>Copyright © 2026</Copyright>
