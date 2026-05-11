@@ -2,6 +2,7 @@
 
     <PropertyGroup>
       <UseLocalLib>false</UseLocalLib>
+      <IsPackable>false</IsPackable>
     </PropertyGroup>
 
 </Project>
