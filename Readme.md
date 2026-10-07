@@ -19,7 +19,7 @@ Install-Package UrlPreviewParser
 
 **PackageReference**
 ```xml
-<PackageReference Include="UrlPreviewParser" Version="1.0.2" />
+<PackageReference Include="UrlPreviewParser" Version="1.1.0" />
 ```
 
 ## Quick Start
@@ -47,6 +47,9 @@ Console.WriteLine(result.Tags.Title);
 
 ### OpenGraph (`result.OpenGraph`)
 
+`og:*` tags are read from both the `property` and the `name` attribute; when a key appears more than once
+the first occurrence wins (e.g. the first `og:image`).
+
 `OpenGraphData` extends `Dictionary<string, string>`. Any `og:*` property is accessible by key
 (e.g., `result.OpenGraph["og:title"]`). Convenience properties cover the most common fields:
 
@@ -60,6 +63,8 @@ Console.WriteLine(result.Tags.Title);
 | `SiteName` | `og:site_name` |
 
 ### Twitter Card (`result.TwitterCard`)
+
+`twitter:*` tags are read from both the `name` and the `property` attribute (first occurrence wins).
 
 `TwitterCardData` extends `Dictionary<string, string>`. Any `twitter:*` property is accessible
 by key (e.g., `result.TwitterCard["twitter:label1"]`). Convenience properties:
@@ -90,13 +95,58 @@ Discovered oEmbed endpoint URLs and the raw response body:
 
 | Property | Type | Description |
 |---|---|---|
-| `Title` | `string?` | Content of the HTML `<title>` element |
+| `Title` | `string?` | Content of the first HTML `<title>` element |
 | `Images` | `List<string>` | Image URLs found on the page |
+| `Description` | `string?` | `<meta name="description">` |
+| `Canonical` | `string?` | `<link rel="canonical">` |
+| `Favicon` | `string?` | First `rel="icon"` (incl. `shortcut icon`), else `apple-touch-icon`, `mask-icon`, … |
+| `Language` | `string?` | `lang` attribute of `<html>` |
+| `Charset` | `string?` | `<meta charset>` or `<meta http-equiv="Content-Type">` |
+| `Viewport` | `string?` | `<meta name="viewport">` |
+| `Robots` | `string?` | `<meta name="robots">` |
+| `ThemeColor` | `string?` | `<meta name="theme-color">` |
+| `Generator` | `string?` | `<meta name="generator">` |
 
 ### Raw head elements (`result.Head`)
 
 `result.Head` is a `List<Dictionary<string, string?>>` containing the raw attributes of every
 child element of `<head>`. Useful when you need access to tags not covered by the typed properties.
+Values in `Head` are never modified (relative URLs stay relative).
+
+### URLs
+
+`result.Url` is the requested URL; `result.FinalUrl` is the URL actually parsed after redirects.
+
+By default relative URLs in URL-valued properties (`og:image`, `og:url`, `og:video`, `og:audio` and their
+`:url`/`:secure_url` variants, `twitter:image`, `twitter:image:src`, `twitter:player`, `twitter:url`,
+`Tags.Canonical`, `Tags.Favicon`, oEmbed endpoints) are resolved to absolute URLs against `<base href>`
+or `FinalUrl`. Absolute values (including `data:` URIs) and non-URL values such as `og:image:width` are
+left untouched.
+
+## Options
+
+```csharp
+var options = new UrlPreviewOptions
+{
+    Timeout = TimeSpan.FromSeconds(10),    // default 15 s; null = only HttpClient.Timeout
+    MaxContentLength = 2 * 1024 * 1024,    // default 5 MB; the rest of the body is ignored
+    FetchOembed = false,                   // default true
+    ResolveRelativeUrls = true,            // default true
+};
+
+using var client = new UrlPreviewClient(httpClient, options);
+```
+
+When the timeout elapses `GetPreviewAsync` throws a `TimeoutException`; non-success status codes
+throw an `HttpRequestException` (with `StatusCode` set on .NET 5+).
+
+The body is decoded with the charset from the `Content-Type` header, a byte order mark, or a
+`<meta charset>` in the first 1024 bytes, falling back to UTF-8. To support legacy code pages such as
+`windows-1252` on .NET, register the provider once at startup:
+
+```csharp
+Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+```
 
 ## Using Your Own HttpClient
 

@@ -11,6 +11,7 @@ internal static class OembedFetcher
     public static async Task FetchAsync(
         HttpClient httpClient,
         UrlPreviewResult result,
+        long maxContentLength,
         CancellationToken cancellationToken = default)
     {
         if (result.Oembed.Formats.Count == 0 || result.Oembed.Json is null)
@@ -18,15 +19,15 @@ internal static class OembedFetcher
 
         try
         {
-            var response = await httpClient
-                .GetAsync(result.Oembed.Json, cancellationToken)
+            using var response = await httpClient
+                .GetAsync(result.Oembed.Json, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
                 .ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
-            result.Oembed.Body = await response.Content
-                .ReadAsStringAsync()
+            result.Oembed.Body = await HtmlContentReader
+                .ReadAsStringAsync(response.Content, maxContentLength, cancellationToken)
                 .ConfigureAwait(false);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
         {
             result.Oembed.Error = ex.Message;
         }

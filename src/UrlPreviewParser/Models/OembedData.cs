@@ -10,7 +10,7 @@ public class OembedData
     /// <summary>
     /// Discovered oEmbed formats (e.g., "json", "xml").
     /// </summary>
-    public List<string> Formats { get; } = new List<string>();
+    public List<string> Formats { get; set; } = new List<string>();
 
     /// <summary>
     /// URL of the oEmbed JSON endpoint (from &lt;link rel="alternate" type="application/json+oembed"&gt;).

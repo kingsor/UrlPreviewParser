@@ -217,4 +217,222 @@ public class MetadataParserTests
 
         Assert.Equal("https://example.com/src.jpg", result.TwitterCard.Image);
     }
+
+    [Fact]
+    public async Task Parse_ReadsOpenGraphFromNameAndTwitterFromProperty()
+    {
+        const string html = """
+                <html>
+                <head>
+                    <meta name="og:title" content="OG via name" />
+                    <meta property="twitter:card" content="summary" />
+                </head>
+                <body></body>
+                </html>
+                """;
+
+        var result = await Parse(html);
+
+        Assert.Equal("OG via name", result.OpenGraph.Title);
+        Assert.Equal("summary", result.TwitterCard.Card);
+    }
+
+    [Fact]
+    public async Task Parse_FirstOccurrenceWins()
+    {
+        const string html = """
+                <html>
+                <head>
+                    <title>First</title>
+                    <title>Second</title>
+                    <meta property="og:image" content="https://example.com/first.jpg" />
+                    <meta property="og:image" content="https://example.com/second.jpg" />
+                </head>
+                <body></body>
+                </html>
+                """;
+
+        var result = await Parse(html);
+
+        Assert.Equal("First", result.Tags.Title);
+        Assert.Equal("https://example.com/first.jpg", result.OpenGraph.Image);
+    }
+
+    [Fact]
+    public async Task Parse_ResolvesRelativeUrls()
+    {
+        const string html = """
+                <html>
+                <head>
+                    <meta property="og:image" content="/img/cover.png" />
+                    <meta property="og:url" content="post" />
+                    <meta name="twitter:image" content="//cdn.example.net/tw.png" />
+                    <link rel="canonical" href="../canonical" />
+                    <link rel="icon" href="favicon.svg" />
+                    <link rel="alternate" type="application/json+oembed" href="/oembed?id=1" />
+                </head>
+                <body></body>
+                </html>
+                """;
+
+        var result = await new UrlPreviewClient().ParseAsync("https://example.com/blog/post", html);
+
+        Assert.Equal("https://example.com/img/cover.png", result.OpenGraph.Image);
+        Assert.Equal("https://example.com/blog/post", result.OpenGraph.Url);
+        Assert.Equal("https://cdn.example.net/tw.png", result.TwitterCard.Image);
+        Assert.Equal("https://example.com/canonical", result.Tags.Canonical);
+        Assert.Equal("https://example.com/blog/favicon.svg", result.Tags.Favicon);
+        Assert.Equal("https://example.com/oembed?id=1", result.Oembed.Json);
+        Assert.Equal("https://example.com/img/cover.png", result.Tags.Images[0]);
+    }
+
+    [Fact]
+    public async Task Parse_ResolvesAgainstBaseHref()
+    {
+        const string html = """
+                <html>
+                <head>
+                    <base href="https://static.example.org/assets/" />
+                    <meta property="og:image" content="cover.png" />
+                </head>
+                <body></body>
+                </html>
+                """;
+
+        var result = await Parse(html);
+
+        Assert.Equal("https://static.example.org/assets/cover.png", result.OpenGraph.Image);
+    }
+
+    [Fact]
+    public async Task Parse_DoesNotResolveNonUrlValues()
+    {
+        const string html = """
+                <html>
+                <head>
+                    <meta property="og:image" content="data:image/png;base64,AAAA" />
+                    <meta property="og:image:width" content="1200" />
+                    <meta property="og:image:alt" content="A picture" />
+                    <link rel="alternate" hreflang="it" href="/it" />
+                </head>
+                <body></body>
+                </html>
+                """;
+
+        var result = await Parse(html);
+
+        Assert.Equal("data:image/png;base64,AAAA", result.OpenGraph.Image);
+        Assert.Equal("1200", result.OpenGraph["og:image:width"]);
+        Assert.Equal("A picture", result.OpenGraph["og:image:alt"]);
+        Assert.Contains(result.Head, h => h.TryGetValue("href", out var href) && href == "/it");
+    }
+
+    [Fact]
+    public async Task Parse_KeepsRelativeUrlsWhenResolutionDisabled()
+    {
+        const string html = """
+                <html>
+                <head><meta property="og:image" content="/cover.png" /></head>
+                <body></body>
+                </html>
+                """;
+
+        var client = new UrlPreviewClient(new Models.UrlPreviewOptions { ResolveRelativeUrls = false });
+        var result = await client.ParseAsync("https://example.com", html);
+
+        Assert.Equal("/cover.png", result.OpenGraph.Image);
+    }
+
+    [Fact]
+    public async Task Parse_ExtractsTypedTags()
+    {
+        const string html = """
+                <html lang="it-IT">
+                <head>
+                    <meta charset="utf-8" />
+                    <meta name="Description" content="Page description" />
+                    <meta name="viewport" content="width=device-width" />
+                    <meta name="robots" content="index, follow" />
+                    <meta name="theme-color" content="#112233" />
+                    <meta name="generator" content="Hugo" />
+                </head>
+                <body></body>
+                </html>
+                """;
+
+        var result = await Parse(html);
+
+        Assert.Equal("it-IT", result.Tags.Language);
+        Assert.Equal("utf-8", result.Tags.Charset);
+        Assert.Equal("Page description", result.Tags.Description);
+        Assert.Equal("width=device-width", result.Tags.Viewport);
+        Assert.Equal("index, follow", result.Tags.Robots);
+        Assert.Equal("#112233", result.Tags.ThemeColor);
+        Assert.Equal("Hugo", result.Tags.Generator);
+    }
+
+    [Fact]
+    public async Task Parse_ExtractsCharsetFromHttpEquiv()
+    {
+        const string html = """
+                <html>
+                <head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" /></head>
+                <body></body>
+                </html>
+                """;
+
+        var result = await Parse(html);
+
+        Assert.Equal("ISO-8859-1", result.Tags.Charset);
+    }
+
+    [Fact]
+    public async Task Parse_FaviconPrefersIconOverAppleTouchIcon()
+    {
+        const string html = """
+                <html>
+                <head>
+                    <link rel="apple-touch-icon" href="https://example.com/apple.png" />
+                    <link rel="Shortcut Icon" href="https://example.com/favicon.ico" />
+                </head>
+                <body></body>
+                </html>
+                """;
+
+        var result = await Parse(html);
+
+        Assert.Equal("https://example.com/favicon.ico", result.Tags.Favicon);
+    }
+
+    [Fact]
+    public async Task Parse_FaviconFallsBackToAppleTouchIcon()
+    {
+        const string html = """
+                <html>
+                <head><link rel="apple-touch-icon" href="https://example.com/apple.png" /></head>
+                <body></body>
+                </html>
+                """;
+
+        var result = await Parse(html);
+
+        Assert.Equal("https://example.com/apple.png", result.Tags.Favicon);
+    }
+
+    [Fact]
+    public async Task Parse_RelIsCaseInsensitive()
+    {
+        const string html = """
+                <html>
+                <head>
+                    <link rel="Alternate" type="application/json+oembed" href="https://example.com/oembed" />
+                </head>
+                <body></body>
+                </html>
+                """;
+
+        var result = await Parse(html);
+
+        Assert.Equal("https://example.com/oembed", result.Oembed.Json);
+    }
 }
