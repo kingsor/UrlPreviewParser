@@ -18,10 +18,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Set up .NET Core
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '10.x'
 
@@ -34,7 +34,7 @@ jobs:
         run: dotnet test --configuration Release --no-build --collect:"XPlat Code Coverage" --results-directory ./code-coverage
 
       - name: ReportGenerator
-        uses: danielpalme/ReportGenerator-GitHub-Action@5.5.5
+        uses: danielpalme/ReportGenerator-GitHub-Action@5.5.11
         with:
           reports: code-coverage/**/coverage.cobertura.xml
           targetdir: coveragereport
@@ -71,7 +71,7 @@ jobs:
       contents: write
 
     steps:
-      - uses: fastify/github-action-merge-dependabot@v3.12.0
+      - uses: fastify/github-action-merge-dependabot@v3.15.0
 
   deploy-nuget:
     if: ${{ github.event_name != 'pull_request' }}
