@@ -420,6 +420,33 @@ public class MetadataParserTests
     }
 
     [Fact]
+    public async Task Parse_ResultRoundTripsThroughSystemTextJson()
+    {
+        const string html = """
+                <html lang="en">
+                <head>
+                    <title>Title</title>
+                    <meta property="og:image" content="/cover.png" />
+                    <meta name="twitter:card" content="summary" />
+                    <link rel="canonical" href="/canonical" />
+                </head>
+                <body></body>
+                </html>
+                """;
+
+        var result = await Parse(html);
+
+        var json = System.Text.Json.JsonSerializer.Serialize(result);
+        var copy = System.Text.Json.JsonSerializer.Deserialize<Models.UrlPreviewResult>(json)!;
+
+        Assert.Equal("https://example.com/cover.png", copy.OpenGraph.Image);
+        Assert.Equal("summary", copy.TwitterCard.Card);
+        Assert.Equal("https://example.com/canonical", copy.Tags.Canonical);
+        Assert.Equal("en", copy.Tags.Language);
+        Assert.Equal(result.Head.Count, copy.Head.Count);
+    }
+
+    [Fact]
     public async Task Parse_RelIsCaseInsensitive()
     {
         const string html = """
