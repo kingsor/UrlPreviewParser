@@ -39,9 +39,11 @@ namespace ConsoleSample
                 var jsonResolver = new PropertyIgnoreContractResolver();
                 jsonResolver.IgnoreProperty(typeof(UrlPreviewResult), "Body");
 
-                var serializerSettings = new JsonSerializerSettings();
-                serializerSettings.ContractResolver = jsonResolver;
-                serializerSettings.Formatting = Formatting.Indented;
+                var serializerSettings = new JsonSerializerSettings
+                {
+                    ContractResolver = jsonResolver,
+                    Formatting = Formatting.Indented
+                };
 
                 var serialized = JsonConvert.SerializeObject(preview, serializerSettings);
                 Console.WriteLine(serialized);
